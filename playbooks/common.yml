@@ -1,20 +1,20 @@
 ---
--
-  name: Running some tasks on all hosts
-  hosts: all
-  tasks:
-    - name: Installing wireshak on Redhat flavours servers repository
-      yum:
-        name: wireshark
-        state: latest
-      when: ansible_os_family == 'RedHat'
-      become: yes
-    - name: Installing wireshak on Ubuntu servers repository
-      apt:
-        name: wireshark
-        state: latest
-      when: ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu'
-      become: yes
+#-
+  # name: Running some tasks on all hosts
+  # hosts: all
+  # tasks:
+  #   - name: Installing wireshak on Redhat flavours servers repository
+  #     yum:
+  #       name: wireshark
+  #       state: latest
+  #     when: ansible_os_family == 'RedHat'
+  #     become: yes
+  #   - name: Installing wireshak on Ubuntu servers repository
+  #     apt:
+  #       name: wireshark
+  #       state: latest
+  #     when: ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu'
+  #     become: yes
     # - name: create a test dir
     #   file:
     #     path: "~/Testing_Ansible"
@@ -24,8 +24,30 @@
     #     path: "~/Testing_Ansible/test_script.sh"
     #     state: touch
     #     mode: a=rwx
-    - name: update timezone on all servers
-      command: timedatectl set-timezone Africa/Lagos
-      become: yes
-    - name: Run a testscript
-      script: ~/ansible-config-mgt/test_script.sh
+
+- name: update web, nfs and db servers
+  hosts: webservers, nfs
+  remote_user: ec2-user
+  become: yes
+  become_user: root
+  tasks:
+  - name: ensure wireshark is at the latest version
+    yum:
+      name: wireshark
+      state: latest
+
+- name: update LB server
+  hosts: lb
+  remote_user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+  - name: ensure wireshark is at the latest version
+    apt:
+      name: wireshark
+      state: latest
+- name: update timezone on all servers
+  command: timedatectl set-timezone Africa/Lagos
+  become: yes
+- name: Run a testscript
+  script: ~/ansible-config-mgt/test_script.sh
