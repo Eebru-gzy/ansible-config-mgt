@@ -1,0 +1,31 @@
+---
+-
+  name: Running some tasks on all hosts
+  hosts: all
+  tasks:
+    - name: Installing wireshak on Redhat flavours servers repository
+      yum:
+        name: wireshark
+        state: latest
+      when: ansible_os_family == 'RedHat'
+      become: yes
+    - name: Installing wireshak on Ubuntu servers repository
+      apt:
+        name: wireshark
+        state: latest
+      when: ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu'
+      become: yes
+    # - name: create a test dir
+    #   file:
+    #     path: "~/Testing_Ansible"
+    #     state: directory
+    # - name: create a test file
+    #   file:
+    #     path: "~/Testing_Ansible/test_script.sh"
+    #     state: touch
+    #     mode: a=rwx
+    - name: update timezone on all servers
+      command: timedatectl set-timezone Africa/Lagos
+      become: yes
+    - name: Run a testscript
+      script: ~/ansible-config-mgt/test_script.sh
