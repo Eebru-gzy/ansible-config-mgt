@@ -46,8 +46,8 @@
     apt:
       name: wireshark
       state: latest
+
 - name: update timezone on all servers
+  host: all
   command: timedatectl set-timezone Africa/Lagos
   become: yes
-- name: Run a testscript
-  script: ~/ansible-config-mgt/test_script.sh
