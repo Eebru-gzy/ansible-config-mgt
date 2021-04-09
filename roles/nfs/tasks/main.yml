@@ -1,0 +1,210 @@
+---
+# tasks for nfs
+
+  # partition creation
+  - name: "create partitions on devices"
+    block:
+      - name: Install parted
+        package:
+          name: parted
+          state: present
+      
+      - name: add new partition on /dev/xvdf
+        parted:
+          device: "/dev/xvdf"
+          number: "1"
+          part_type: primary
+          flags: [ lvm ]
+          state: present
+          part_start: "0%"
+          part_end: "100%"
+
+      - name: add new partition on /dev/xvdh
+        parted:
+          device: "/dev/xvdg"
+          number: "1"
+          part_type: primary
+          flags: [ lvm ]
+          state: present
+          part_start: "0%"
+          part_end: "100%"
+
+      - name: add new partition on /dev/xvdh
+        parted:
+          device: "/dev/xvdh"
+          number: "1"
+          part_type: primary
+          flags: [ lvm ]
+          state: present
+          part_start: "0%"
+          part_end: "100%"
+
+  # install lvm
+  - name: Install lvm
+    yum:
+      name: lvm2
+      state: present
+  # install git
+  - name: Install git
+    yum:
+      name: git
+      state: present
+  
+  # -----------install firewalld-----------
+
+  - name: Installing firewalld
+    yum:
+      name: firewalld
+      state: present
+  # enable firewalld
+  - name: enable firewalld
+    service:
+      name: firewalld
+      state: started
+      enabled: yes
+# -----------install firewalld-----------
+
+  # logical volume creation
+  - name: create "{{ vg_name }}" volume group
+    lvg:
+      vg: "{{ vg_name }}"
+      pvs: "/dev/xvdf1,/dev/xvdg1,/dev/xvdh1"
+      force: no
+      state: present
+
+  - name: create the "{{ lv1_name }}" logical volume
+    lvol:
+      vg: "{{ vg_name }}"
+      lv: "{{ lv1_name }}"
+      size: "{{ lv_size }}"
+      active: yes
+      force: no
+      state: present
+
+  - name: create the "{{ lv2_name }}" logical volume
+    lvol:
+      vg: "{{ vg_name }}"
+      lv: "{{ lv2_name }}"
+      size: "{{ lv_size }}"
+      active: yes
+      force: no
+      state: present
+
+  - name: create the "{{ lv3_name }}" logical volume
+    lvol:
+      vg: "{{ vg_name }}"
+      lv: "{{ lv3_name }}"
+      size: "{{ lv_size_last }}"
+      active: yes
+      force: yes
+      state: present
+
+  # formatting the lvs with choosen filesystem
+  - name: Setting up a/an "{{ fs }}" filesystem on lvm "/dev/{{ vg_name }}/{{ lv1_name }}"
+    filesystem:
+      fstype: "{{ fs }}"
+      dev: "/dev/{{ vg_name }}/{{ lv1_name }}"
+      force: no
+
+  - name: Setting up a/an "{{ fs }}" filesystem on lvm "/dev/{{ vg_name }}/{{ lv2_name }}"
+    filesystem:
+      fstype: "{{ fs }}"
+      dev: "/dev/{{ vg_name }}/{{ lv2_name }}"
+      force: no
+
+  - name: Setting up a/an "{{ fs }}" filesystem on lvm "/dev/{{ vg_name }}/{{ lv3_name }}"
+    filesystem:
+      fstype: "{{ fs }}"
+      dev: "/dev/{{ vg_name }}/{{ lv3_name }}"
+      force: no
+
+  # create mount points
+  - name: creating a directory to mount the filesystems
+    file:
+      path: "{{ item }}"
+      state: directory
+      mode: 0755
+    loop:
+      - /mnt/opt
+      - /mnt/apps
+      - /mnt/logs
+  
+  # mount the filesystems by label (UUID will be splendid though!)
+  - name: mounting the "{{ fs }}" filesystem
+    mount:
+      path: "{{ item.dir }}"
+      src: "/dev/{{ vg_name }}/{{ item.lv }}"
+      fstype: "{{ fs }}"
+      opts: nosuid,noexec,defaults
+      state: mounted
+    loop:
+      - { dir: '/mnt/apps', lv: '{{ lv1_name }}' }
+      - { dir: '/mnt/logs', lv: '{{ lv2_name }}' }
+      - { dir: '/mnt/opt', lv: '{{ lv3_name }}' }
+
+  # install nfs utils
+  - name: nfs_setup
+    yum:
+      name: nfs-utils
+      state: present
+
+  # start and enable nfs server
+  - name: enable nfs server
+    service:
+      name: nfs-server
+      state: started
+      enabled: yes
+
+#   # NFS subnet access exports.
+  - name: mounting exports in /etc/exports file
+    ansible.builtin.template:
+      src: mount.j2
+      dest: /etc/exports
+      owner: root
+      group: root
+      mode: 0644
+  
+  - name: export nfs mount points
+    command: exportfs -a
+
+  # clone repo
+  - name: Clone tooling repo
+    ansible.builtin.git:
+      repo: https://github.com/Eebru-gzy/tooling.git
+      dest: /mnt/apps
+  
+  # add neccessary firewall services for NFS share
+  - name: configuring firewalld for nfs service
+    ansible.posix.firewalld:
+      zone: public
+      service: "{{ item.service }}"
+      permanent: yes
+      state: enabled
+    loop:
+      - service: nfs
+      - service: mountd
+      - service: rpc-bind
+  
+  # add IP address source
+  # source should be automated though
+  - name: adding IP source to firewall rules
+    ansible.posix.firewalld:
+      zone: public
+      source: 172.31.16.0/20
+      permanent: yes
+      state: enabled
+  
+  # add NFS port to firewall rules
+  - name: adding NFS port to firewall rule
+    ansible.posix.firewalld:
+      zone: public
+      port: "{{ item.port }}"
+      permanent: yes
+      state: enabled
+    loop:
+      - port: 2049/tcp
+      - port: 2049/udp
+
+  # reload firewalld
+  - name: reload firewalld
+    command: firewall-cmd --reload

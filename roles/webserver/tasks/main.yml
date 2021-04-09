@@ -1,0 +1,28 @@
+---
+# tasks file for webserver
+- name: Update the yum repository
+  yum: state=latest
+# - name: Install prerequisites
+#   yum: name=pre-req-packages state=present
+- name: Install Apache
+  yum: name=httpd state=present
+
+- name: install NFS utils
+  become: true
+  become_user: root
+  shell: yum install nfs-utils nfs4-acl-tools -y
+  args:
+    executable: /bin/bash
+
+- name: Mount an NFS volume
+  mount:
+    src: 172.31.18.118:/mnt/apps
+    path: /var/www
+    opts: rw,nosuid
+    state: unmounted
+    state: mounted
+    fstype: nfs
+
+- name: Start Apache
+  service: name=httpd state=started enabled=true
+

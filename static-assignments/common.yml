@@ -1,43 +1,17 @@
 ---
-#-
-  # name: Running some tasks on all hosts
-  # hosts: all
-  # tasks:
-  #   - name: Installing wireshak on Redhat flavours servers repository
-  #     yum:
-  #       name: wireshark
-  #       state: latest
-  #     when: ansible_os_family == 'RedHat'
-  #     become: yes
-  #   - name: Installing wireshak on Ubuntu servers repository
-  #     apt:
-  #       name: wireshark
-  #       state: latest
-  #     when: ansible_os_family == 'Debian' or ansible_os_family == 'Ubuntu'
-  #     become: yes
-    # - name: create a test dir
-    #   file:
-    #     path: "~/Testing_Ansible"
-    #     state: directory
-    # - name: create a test file
-    #   file:
-    #     path: "~/Testing_Ansible/test_script.sh"
-    #     state: touch
-    #     mode: a=rwx
-
-- name: update web, nfs and db servers
-  hosts: webservers, nfs_server
+- name: Ensure Wireshack is latest on web, and nfs servers
+  hosts: web_servers, nfs_server
   become: yes
   remote_user: ec2-user
   become_user: root
   tasks:
-  - name: ensure wireshark is at the latest version
+  - name: ensure wireshark is at the latest  version
     yum:
       name: wireshark
       state: present
 
 
-- name: update LB server
+- name: Ensure Wireshack is latest on LB server
   hosts: load_balancer
   remote_user: ubuntu
   become: yes
@@ -48,8 +22,8 @@
       name: wireshark
       state: present
 
-# I do not understand why the below task screams syntax error.
-# - name: update timezone on all servers
-#   hosts: all
-#   command: timedatectl set-timezone Africa/Lagos
-#   become: yes
+- name: update timezone on all servers
+  hosts: all
+  become: yes
+  tasks:
+   - command: timedatectl set-timezone Africa/Lagos

@@ -1,0 +1,6 @@
+---
+- name: Play for nfs servers
+  become: true
+  hosts: nfs_server
+  roles:
+    - nfs

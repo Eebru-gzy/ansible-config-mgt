@@ -1,0 +1,16 @@
+---
+# Setup/install tasks.
+- include_tasks: "setup-{{ ansible_os_family }}-certbot.yml"
+ 
+- name: "Create and Install Cert Using {{ certbot_plugin }} Plugin"
+  command: "certbot --nginx -d  {{ certbot_site_names }} -m {{ certbot_mail_address }} --agree-tos --noninteractive --redirect"
+
+- name: restart NGINX
+  service:
+    name: nginx
+    state: restarted
+
+- name: Set Letsencrypt Cronjob for Certificate Auto Renewal
+  cron: name=letsencrypt_renewal special_time=monthly job="/usr/bin/certbot renew"
+  when: ansible_facts['os_family'] == "RedHat"
+

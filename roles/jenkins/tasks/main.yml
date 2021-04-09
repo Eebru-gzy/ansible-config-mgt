@@ -1,0 +1,32 @@
+---
+# tasks file for jenkins
+
+- name: Add Jenkins apt repo to the trusted sources list
+  apt_repository: 
+    repo: 'deb http://pkg.jenkins-ci.org/debian binary/'
+    update_cache: yes
+    state: present
+
+- name: Add the Jenkins public GPG key to the apt repo
+  apt_key: 
+    url: http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key
+    state: present
+
+- name: Upgrade apt
+  apt:
+    name: '*'
+    state: latest
+
+- name: install java and jenkins
+  apt:
+    name: jenkins
+    state: present
+
+- name: allow systemd to reread configs
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: start jenkins
+  ansible.builtin.systemd:
+    state: started
+    name: jenkins

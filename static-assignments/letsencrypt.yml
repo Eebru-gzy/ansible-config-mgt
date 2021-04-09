@@ -1,0 +1,7 @@
+---
+- name: play for ssl certificate setup using letsencrypt
+  become: true
+  hosts: lb
+  
+  roles:
+    - letsencrypt

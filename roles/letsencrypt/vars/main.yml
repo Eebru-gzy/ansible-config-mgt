@@ -1,0 +1,7 @@
+---
+# vars file for letsencrypt
+# certbot_package: "python3-certbot-nginx"
+certbot_plugin: "nginx"
+certbot_mail_address: alaoopeyemi101@gmail.com
+
+certbot_site_names: "cropit.xyz"

@@ -1,0 +1,7 @@
+---
+- name: play for loadbalancers
+  hosts: lb
+  become: true
+  roles:
+    - { role: nginx, when: load_balancer_is_required }
+    # - { role: apache, when: enable_apache_lb and load_balancer_is_required }

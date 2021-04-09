@@ -1,7 +1,58 @@
 ---
-# - hosts: all
-# - name: Import common playbook
-#   import_playbook: ../static-assignments/common.yml
+- name: Include dynamic variables
+  hosts: all
 
-- name: Import webserver play
+- name: import the common playbook
+  import_playbook: ../static-assignments/common.yml
+  tags:
+    - always
+
+#[DEPRECATION WARNING]: 'include' for playbook includes. 
+# You should use 'import_playbook' instead. 
+# This feature will be removed in version 2.12.
+# Deprecation warnings can be 
+# disabled by setting deprecation_warnings=False in ansible.cfg.
+
+# - name: include the env-vars playbook
+#   ansible.builtin.include: ../dynamic-assignments/env-vars.yml
+#   tags:
+#     - always
+
+# -------------------------------------
+- name: include the env-vars playbook
+  import_playbook: ../dynamic-assignments/env-vars.yml
+  tags:
+    - always
+
+- name: Testing the env. vars
+  hosts: web_servers
+  tasks:
+    - debug: 
+        msg: "{{enable_apache_lb}}"
+
+# -------------------------------------
+
+# configure nfs server
+- name: loading play for NFS server(s)
+  import_playbook: ../static-assignments/nfs.yml
+
+# configure database server
+- name: loading play for database server(s)
+  import_playbook: ../static-assignments/db.yml
+
+# configure webservers
+- name: Webserver assignment
   import_playbook: ../static-assignments/webservers.yml
+
+# configure loadbalancer
+- name: Loadbalancers assignment
+  import_playbook: ../static-assignments/lb.yml
+  when: load_balancer_is_required
+
+# setup ssl
+- name: Letsencrypt assignment
+  import_playbook: ../static-assignments/letsencrypt.yml
+
+# configure jenkins server
+- name: jenkins assignment
+  import_playbook: ../static-assignments/jenkins.yml

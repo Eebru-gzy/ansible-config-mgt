@@ -1,0 +1,7 @@
+---
+- name: Play for Jenkins Installation
+  become: true
+  hosts: localhost
+  
+  roles:
+    - jenkins
