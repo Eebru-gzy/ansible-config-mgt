@@ -1,58 +1,125 @@
+
 ---
-- name: Include dynamic variables
-  hosts: all
+- name: Ensure Wireshack is latest on web, and nfs servers
+  hosts: web_servers, nfs_server
+  become: yes
+  remote_user: ec2-user
+  become_user: root
+  tasks:
+  - name: ensure wireshark is at the latest  version
+    yum:
+      name: wireshark
+      state: present
 
-- name: import the common playbook
-  import_playbook: ../static-assignments/common.yml
-  tags:
-    - always
 
-#[DEPRECATION WARNING]: 'include' for playbook includes. 
-# You should use 'import_playbook' instead. 
-# This feature will be removed in version 2.12.
-# Deprecation warnings can be 
-# disabled by setting deprecation_warnings=False in ansible.cfg.
+- name: Ensure Wireshack is latest on LB server
+  hosts: load_balancer
+  # remote_user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+  - name: ensure wireshark is at the latest version
+    apt:
+      name: wireshark
+      state: present
 
-# - name: include the env-vars playbook
-#   ansible.builtin.include: ../dynamic-assignments/env-vars.yml
+# - name: update timezone on all servers
+#   hosts: all
+#   become: yes
+#   become_user: root
+#   tasks:
+#    - command: timedatectl set-timezone Africa/Lagos
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ---
+# - name: Include dynamic variables
+#   hosts: all
+
+# - name: import the common playbook
+#   import_playbook: ../static-assignments/common.yml
 #   tags:
 #     - always
 
-# -------------------------------------
-- name: include the env-vars playbook
-  import_playbook: ../dynamic-assignments/env-vars.yml
-  tags:
-    - always
+# #[DEPRECATION WARNING]: 'include' for playbook includes. 
+# # You should use 'import_playbook' instead. 
+# # This feature will be removed in version 2.12.
+# # Deprecation warnings can be 
+# # disabled by setting deprecation_warnings=False in ansible.cfg.
 
-- name: Testing the env. vars
-  hosts: web_servers
-  tasks:
-    - debug: 
-        msg: "{{enable_apache_lb}}"
+# # - name: include the env-vars playbook
+# #   ansible.builtin.include: ../dynamic-assignments/env-vars.yml
+# #   tags:
+# #     - always
 
-# -------------------------------------
+# # -------------------------------------
+# - name: include the env-vars playbook
+#   import_playbook: ../dynamic-assignments/env-vars.yml
+#   tags:
+#     - always
 
-# configure nfs server
-- name: loading play for NFS server(s)
-  import_playbook: ../static-assignments/nfs.yml
+# - name: Testing the env. vars
+#   hosts: web_servers
+#   tasks:
+#     - debug: 
+#         msg: "{{enable_apache_lb}}"
 
-# configure database server
-- name: loading play for database server(s)
-  import_playbook: ../static-assignments/db.yml
+# # -------------------------------------
 
-# configure webservers
-- name: Webserver assignment
-  import_playbook: ../static-assignments/webservers.yml
+# # configure nfs server
+# - name: loading play for NFS server(s)
+#   import_playbook: ../static-assignments/nfs.yml
 
-# configure loadbalancer
-- name: Loadbalancers assignment
-  import_playbook: ../static-assignments/lb.yml
-  when: load_balancer_is_required
+# # configure database server
+# - name: loading play for database server(s)
+#   import_playbook: ../static-assignments/db.yml
 
-# setup ssl
-- name: Letsencrypt assignment
-  import_playbook: ../static-assignments/letsencrypt.yml
+# # configure webservers
+# - name: Webserver assignment
+#   import_playbook: ../static-assignments/webservers.yml
 
-# configure jenkins server
-- name: jenkins assignment
-  import_playbook: ../static-assignments/jenkins.yml
+# # configure loadbalancer
+# - name: Loadbalancers assignment
+#   import_playbook: ../static-assignments/lb.yml
+#   when: load_balancer_is_required
+
+# # setup ssl
+# - name: Letsencrypt assignment
+#   import_playbook: ../static-assignments/letsencrypt.yml
+
+# # configure jenkins server
+# - name: jenkins assignment
+#   import_playbook: ../static-assignments/jenkins.yml
