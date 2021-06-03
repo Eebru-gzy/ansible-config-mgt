@@ -1,27 +1,27 @@
 
----
-- name: Ensure Wireshack is latest on web, and nfs servers
-  hosts: web_servers, nfs_server
-  become: yes
-  remote_user: ec2-user
-  become_user: root
-  tasks:
-  - name: ensure wireshark is at the latest  version
-    yum:
-      name: wireshark
-      state: present
+# ---
+# - name: Ensure Wireshack is latest on web, and nfs servers
+#   hosts: web_servers, nfs_server
+#   become: yes
+#   remote_user: ec2-user
+#   become_user: root
+#   tasks:
+#   - name: ensure wireshark is at the latest  version
+#     yum:
+#       name: wireshark
+#       state: present
 
 
-- name: Ensure Wireshack is latest on LB server
-  hosts: load_balancer
-  # remote_user: ubuntu
-  become: yes
-  become_user: root
-  tasks:
-  - name: ensure wireshark is at the latest version
-    apt:
-      name: wireshark
-      state: present
+# - name: Ensure Wireshack is latest on LB server
+#   hosts: load_balancer
+#   remote_user: ubuntu
+#   become: yes
+#   become_user: root
+#   tasks:
+#   - name: ensure wireshark is at the latest version
+#     apt:
+#       name: wireshark
+#       state: present
 
 # - name: update timezone on all servers
 #   hosts: all
@@ -65,61 +65,61 @@
 
 
 
-# ---
-# - name: Include dynamic variables
-#   hosts: all
+---
+- name: Include dynamic variables
+  hosts: all
 
-# - name: import the common playbook
-#   import_playbook: ../static-assignments/common.yml
-#   tags:
-#     - always
+- name: import the common playbook
+  import_playbook: ../static-assignments/common.yml
+  tags:
+    - always
 
-# #[DEPRECATION WARNING]: 'include' for playbook includes. 
-# # You should use 'import_playbook' instead. 
-# # This feature will be removed in version 2.12.
-# # Deprecation warnings can be 
-# # disabled by setting deprecation_warnings=False in ansible.cfg.
+#[DEPRECATION WARNING]: 'include' for playbook includes. 
+# You should use 'import_playbook' instead. 
+# This feature will be removed in version 2.12.
+# Deprecation warnings can be 
+# disabled by setting deprecation_warnings=False in ansible.cfg.
 
-# # - name: include the env-vars playbook
-# #   ansible.builtin.include: ../dynamic-assignments/env-vars.yml
-# #   tags:
-# #     - always
-
-# # -------------------------------------
 # - name: include the env-vars playbook
-#   import_playbook: ../dynamic-assignments/env-vars.yml
+#   ansible.builtin.include: ../dynamic-assignments/env-vars.yml
 #   tags:
 #     - always
 
-# - name: Testing the env. vars
-#   hosts: web_servers
-#   tasks:
-#     - debug: 
-#         msg: "{{enable_apache_lb}}"
+# -------------------------------------
+- name: include the env-vars playbook
+  import_playbook: ../dynamic-assignments/env-vars.yml
+  tags:
+    - always
 
-# # -------------------------------------
+- name: Testing the env. vars
+  hosts: web_servers
+  tasks:
+    - debug: 
+        msg: "{{enable_apache_lb}}"
 
-# # configure nfs server
-# - name: loading play for NFS server(s)
-#   import_playbook: ../static-assignments/nfs.yml
+# -------------------------------------
 
-# # configure database server
-# - name: loading play for database server(s)
-#   import_playbook: ../static-assignments/db.yml
+# configure nfs server
+- name: loading play for NFS server(s)
+  import_playbook: ../static-assignments/nfs.yml
 
-# # configure webservers
-# - name: Webserver assignment
-#   import_playbook: ../static-assignments/webservers.yml
+# configure database server
+- name: loading play for database server(s)
+  import_playbook: ../static-assignments/db.yml
 
-# # configure loadbalancer
-# - name: Loadbalancers assignment
-#   import_playbook: ../static-assignments/lb.yml
-#   when: load_balancer_is_required
+# configure webservers
+- name: Webserver assignment
+  import_playbook: ../static-assignments/webservers.yml
 
-# # setup ssl
-# - name: Letsencrypt assignment
-#   import_playbook: ../static-assignments/letsencrypt.yml
+# configure loadbalancer
+- name: Loadbalancers assignment
+  import_playbook: ../static-assignments/lb.yml
+  when: load_balancer_is_required
 
-# # configure jenkins server
-# - name: jenkins assignment
-#   import_playbook: ../static-assignments/jenkins.yml
+# setup ssl
+- name: Letsencrypt assignment
+  import_playbook: ../static-assignments/letsencrypt.yml
+
+# configure jenkins server
+- name: jenkins assignment
+  import_playbook: ../static-assignments/jenkins.yml
