@@ -100,8 +100,8 @@
 # -------------------------------------
 
 # configure nfs server
-- name: loading play for NFS server(s)
-  import_playbook: ../static-assignments/nfs.yml
+# - name: loading play for NFS server(s)
+#   import_playbook: ../static-assignments/nfs.yml
 
 # configure database server
 - name: loading play for database server(s)

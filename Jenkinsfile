@@ -1,14 +1,12 @@
 pipeline {
   agent any
+  environment{
+    ANSIBLE_CONFIG = "/home/ubuntu/ansible.cfg"
+  }
   stages {
     stage('SCM Checkout') {
       steps {
         git(branch: 'main', url: 'https://github.com/Eebru-gzy/ansible-config-mgt')
-      }
-    }
-    stage('Set ansible config file') {
-      steps {
-        sh 'export ANSIBLE_CONFIG=~/ansible.cfg'
       }
     }
     stage('Execute Ansible') {
