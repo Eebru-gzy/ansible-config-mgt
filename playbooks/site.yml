@@ -42,14 +42,14 @@
     shell: yum install nfs-utils nfs4-acl-tools -y
     args:
       executable: /bin/bash
-  - name: Mount an NFS volume
-      mount:
-        src: 172.31.18.118:/mnt/apps
-        path: /var/www
-        opts: rw,nosuid
-        state: unmounted
-        state: mounted
-        fstype: nfs
+  # - name: Mount an NFS volume
+  #     mount:
+  #       src: 172.31.18.118:/mnt/apps
+  #       path: /var/www
+  #       opts: rw,nosuid
+  #       state: unmounted
+  #       state: mounted
+  #       fstype: nfs
   - name: Start Apache
     service: name=httpd state=started enabled=true
 
