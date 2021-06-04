@@ -1,6 +1,6 @@
 ---
 - name: Webserver Using roles
-  hosts: web_servers
+  hosts: deployments
   roles:
      - webserver
   become: true
