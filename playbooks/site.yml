@@ -1,47 +1,49 @@
 
-# ---
-# - name: Ensure Wireshack is latest on web, and nfs servers
-#   hosts: web_servers, nfs_server
-#   become: yes
-#   remote_user: ec2-user
-#   become_user: root
-#   tasks:
-#   - name: ensure wireshark is at the latest  version
-#     yum:
-#       name: wireshark
-#       state: present
-
-
-# - name: Ensure Wireshack is latest on LB server
-#   hosts: load_balancer
-#   remote_user: ubuntu
-#   become: yes
-#   become_user: root
-#   tasks:
-#   - name: ensure wireshark is at the latest version
-#     apt:
-#       name: wireshark
-#       state: present
-
-# - name: update timezone on all servers
-#   hosts: all
-#   become: yes
-#   become_user: root
-#   tasks:
-#    - command: timedatectl set-timezone Africa/Lagos
-
-
-
 ---
-- name: install NFS utils
-  host: deployments
-  become: true
+- name: Ensure Wireshack is latest on web, and nfs servers
+  hosts: deployments
+  become: yes
+  remote_user: ec2-user
   become_user: root
   tasks:
-  - name: 'install NFS utils task'
-    shell: yum install nfs-utils nfs4-acl-tools -y
-    args:
-      executable: /bin/bash
+  - name: ensure wireshark is at the latest  version
+    yum:
+      name: wireshark
+      state: present
+
+
+- name: Ensure Wireshack is latest on LB server
+  hosts: deployments
+  remote_user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+  - name: ensure wireshark is at the latest version
+    apt:
+      name: wireshark
+      state: present
+
+- name: update timezone on all servers
+  hosts: all
+  become: yes
+  become_user: root
+  tasks:
+   - command: timedatectl set-timezone Africa/Lagos
+
+
+
+# ---
+# - name: install NFS utils
+#   host: deployments
+#   become: true
+#   become_user: root
+#   tasks:
+#   - name: 'install NFS utils task'
+#     shell: yum install nfs-utils nfs4-acl-tools -y
+#     args:
+#       executable: /bin/bash
+#   - name: Start Apache
+#     service: name=httpd state=started enabled=true
   # - name: Mount an NFS volume
   #     mount:
   #       src: 172.31.18.118:/mnt/apps
@@ -50,8 +52,6 @@
   #       state: unmounted
   #       state: mounted
   #       fstype: nfs
-  - name: Start Apache
-    service: name=httpd state=started enabled=true
 
 
 
