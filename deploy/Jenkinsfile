@@ -4,6 +4,13 @@ pipeline {
     ANSIBLE_CONFIG="${WORKSPACE}/deploy/ansible.cfg"
   }
   stages {
+    stage("Initial cleanup") {
+        steps {
+          dir("${WORKSPACE}") {
+            deleteDir()
+          }
+        }
+      }
     stage('SCM Checkout') {
       steps {
         git(branch: 'main', url: 'https://github.com/Eebru-gzy/ansible-config-mgt')
