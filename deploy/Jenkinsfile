@@ -5,12 +5,12 @@ pipeline {
   }
   stages {
     stage("Initial cleanup") {
-        steps {
-          dir("${WORKSPACE}") {
-            deleteDir()
-          }
+      steps {
+        dir("${WORKSPACE}") {
+          deleteDir()
         }
       }
+    }
     stage('SCM Checkout') {
       steps {
         git(branch: 'main', url: 'https://github.com/Eebru-gzy/ansible-config-mgt')
@@ -18,7 +18,7 @@ pipeline {
     }
     stage('Execute Ansible') {
       steps {
-        ansiblePlaybook credentialsId: 'real-mKey', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory/dev', playbook: 'playbooks/site.yml'
+        ansiblePlaybook credentialsId: 'Ansile-ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory/dev', playbook: 'playbooks/site.yml'
       }
     }
     stage('Clean up') {

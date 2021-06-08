@@ -1,17 +1,18 @@
 
 ---
 - name: Ensure Nginx is latest on LB server
-  hosts: deployments
+  hosts: all
   become: yes
   become_user: root
   tasks:
-  - apt:
+  - name: installing NGINX
+    apt:
       name: nginx
       state: present
       update_cache: yes
 
 - name: update timezone on all servers
-  hosts: deployments
+  hosts: all
   become: yes
   become_user: root
   tasks:
