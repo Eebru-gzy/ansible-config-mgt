@@ -1,11 +1,11 @@
 [tooling]
-172.31.25.40
+172.31.25.40 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mKey.pem
 
 [todo]
-172.31.14.182
+172.31.14.182 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mKey.pem
 
 [nginx]
-172.31.14.126
+172.31.14.126 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/mKey.pem
 
 [db]
 172.31.28.116 ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/mKey.pem
@@ -18,4 +18,3 @@ nginx
 [deployments:vars]
 ansible_user=ubuntu
 ansible_ssh_private_key_file=~/.ssh/mKey.pem
-ansible_python_interpreter=/usr/bin/python
