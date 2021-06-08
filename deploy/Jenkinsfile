@@ -18,7 +18,7 @@ pipeline {
     }
     stage('Execute Ansible') {
       steps {
-        ansiblePlaybook colorized: true, credentialsId: 'real-mKey', disableHostKeyChecking: true, installation: 'my_ansible', inventory: 'inventory/dev', playbook: 'playbooks/site.yml'
+        ansiblePlaybook credentialsId: 'real-mKey', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory/dev', playbook: 'playbooks/site.yml'
       }
     }
     stage('Clean up') {
