@@ -3,6 +3,9 @@ pipeline {
   environment{
     ANSIBLE_CONFIG="${WORKSPACE}/deploy/ansible.cfg"
   }
+  parameters {
+    string(name: 'inventory', defaultValue: '${inventory}', description: 'selecting the environment')
+  }
   stages {
     stage("Initial cleanup") {
       steps {
@@ -16,9 +19,14 @@ pipeline {
         git(branch: 'main', url: 'https://github.com/Eebru-gzy/ansible-config-mgt')
       }
     }
+    stage('Prepare Ansible For Execution') {
+      steps {
+        sh 'echo ${WORKSPACE}'
+      }
+    }
     stage('Execute Ansible') {
       steps {
-        ansiblePlaybook credentialsId: 'Ansile-ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory/dev', playbook: 'playbooks/site.yml'
+        ansiblePlaybook credentialsId: 'Ansile-ssh', disableHostKeyChecking: true, installation: 'ansible', inventory: 'inventory/${inventory}', playbook: 'playbooks/site.yml'
       }
     }
     stage('Clean up') {
